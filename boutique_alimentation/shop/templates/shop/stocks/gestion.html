@@ -1,0 +1,105 @@
+{% extends 'shop/base.html' %}
+
+{% block page_title %}Gestion des stocks{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-boxes"></i> État du stock</h5>
+    </div>
+    <div class="card-body">
+        <!-- Alertes de synthèse -->
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="alert alert-info">📦 Total produits : {{ total_produits }}</div>
+            </div>
+            <div class="col-md-4">
+                <div class="alert alert-danger">🔴 Rupture : {{ produits_rupture }}</div>
+            </div>
+            <div class="col-md-4">
+                <div class="alert alert-warning">🟠 Stock faible : {{ produits_faible }}</div>
+            </div>
+        </div>
+
+        <!-- Tableau des produits -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Produit</th>
+                        <th>Catégorie</th>
+                        <th>Stock actuel</th>
+                        <th>Seuil</th>
+                        <th>Statut</th>
+                        <th>Derniers mouvements</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for produit in produits %}
+                    <tr>
+                        <td>
+                            <strong>{{ produit.nom }}</strong><br>
+                            <small class="text-muted">{{ produit.sku|default:"-" }}</small>
+                        </td>
+                        <td>{{ produit.categorie.nom|default:"-" }}</td>
+                        <td>
+                            <span class="{% if produit.quantite_stock == 0 %}text-danger{% elif produit.stock_faible %}text-warning{% else %}text-success{% endif %} fw-bold">
+                                {{ produit.quantite_stock }}
+                            </span>
+                        </td>
+                        <td>{{ produit.stock_min }}</small></td>
+                        <td>
+                            {% if produit.quantite_stock == 0 %}
+                                <span class="badge bg-danger">Rupture</span>
+                            {% elif produit.stock_faible %}
+                                <span class="badge bg-warning text-dark">Stock faible</span>
+                            {% else %}
+                                <span class="badge bg-success">OK</span>
+                            {% endif %}
+                        </small>
+                        <!-- Derniers mouvements (utilisation de la méthode derniers_mouvements) -->
+                        <td>
+                            {% with mouvements=produit.derniers_mouvements %}
+                                {% if mouvements %}
+                                    <ul class="list-unstyled mb-0 small">
+                                        {% for m in mouvements %}
+                                            <li>
+                                                {% if m.type_mouvement == 'in' %}
+                                                    <span class="text-success">+{{ m.quantite }}</span> (entrée)
+                                                {% elif m.type_mouvement == 'out' %}
+                                                    <span class="text-danger">-{{ m.quantite }}</span> (sortie)
+                                                {% else %}
+                                                    <span class="text-warning">↺ {{ m.quantite }}</span> (retour)
+                                                {% endif %}
+                                                <br><small>{{ m.created_at|date:"d/m H:i" }}</small>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <span class="text-muted">Aucun mouvement</span>
+                                {% endif %}
+                            {% endwith %}
+                        </small>
+                        <td>
+                            <a href="{% url 'historique_stock_produit' produit.id %}" class="btn btn-sm btn-info">
+                                <i class="fas fa-history"></i> Historique
+                            </a>
+                            {% if user.profil.role != 'comptable' %}
+                            <a href="{% url 'modifier_produit' produit.id %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            {% endif %}
+                        </small>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">Aucun produit actif trouvé. Vous pouvez ajouter des produits depuis le menu "Produits".</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

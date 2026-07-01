@@ -1,0 +1,61 @@
+{% extends 'shop/base.html' %}
+
+{% block page_title %}Gestion des utilisateurs{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-users"></i> Liste des utilisateurs</h5>
+        <a href="{% url 'ajouter_utilisateur' %}" class="btn btn-light btn-sm">➕ Ajouter</a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Photo</th>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Rôle</th>
+                        <th>Date inscription</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in utilisateurs %}
+                    <tr>
+                        <td>
+                            {% if u.profil.avatar %}
+                                <img src="{{ u.profil.avatar.url }}" width="40" height="40" style="border-radius: 50%; object-fit: cover;">
+                            {% else %}
+                                <i class="fas fa-user-circle fa-2x text-muted"></i>
+                            {% endif %}
+                        </small>
+                        <td><strong>{{ u.username }}</strong>{% if u.is_superuser %} <span class="badge bg-danger">Admin</span>{% endif %}</small></td>
+                        <td>{{ u.email|default:"-" }}</small></td>
+                        <td>
+                            {% if u.profil.role == 'admin' %}
+                                👑 Administrateur
+                            {% elif u.profil.role == 'comptable' %}
+                                💰 Comptable
+                            {% else %}
+                                📋 Gérant
+                            {% endif %}
+                        </small></td>
+                        <td>{{ u.date_joined|date:"d/m/Y" }}</small></td>
+                        <td>
+                            <a href="{% url 'modifier_utilisateur' u.id %}" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                            {% if u != user %}
+                            <a href="{% url 'supprimer_utilisateur' u.id %}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
+                            {% endif %}
+                        </small></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center">Aucun utilisateur</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

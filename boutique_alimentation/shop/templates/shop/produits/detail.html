@@ -1,0 +1,106 @@
+{% extends 'shop/base.html' %}
+
+{% block page_title %}Détail du produit - {{ produit.nom }}{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-box"></i> {{ produit.nom }}</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4 text-center">
+                {% if produit.image %}
+                    <img src="{{ produit.image.url }}" alt="{{ produit.nom }}" class="img-fluid rounded" style="max-height: 200px;">
+                {% else %}
+                    <i class="fas fa-box fa-5x text-muted"></i>
+                {% endif %}
+            </div>
+            <div class="col-md-8">
+                <table class="table table-bordered">
+                    <tr><th>Nom</th><td>{{ produit.nom }}</td></tr>
+                    <tr><th>Catégorie</th><td>{{ produit.categorie.nom|default:"-" }}</td></tr>
+                    <tr><th>Fournisseur</th><td>{{ produit.fournisseur.nom|default:"-" }}</td></tr>
+                    <tr><th>Prix d'achat</th><td>{{ produit.prix_achat|floatformat:0 }} FCFA</td></tr>
+                    <tr><th>Prix de vente</th><td>{{ produit.prix_vente|floatformat:0 }} FCFA</td></tr>
+                    <tr><th>Stock actuel</th>
+                        <td class="{% if produit.quantite_stock == 0 %}text-danger{% elif produit.stock_faible %}text-warning{% else %}text-success{% endif %}">
+                            {{ produit.quantite_stock }} unités
+                        </td>
+                    </tr>
+                    <tr><th>Seuil d'alerte</th><td>{{ produit.stock_min }}</td></tr>
+                    <tr><th>Unité</th><td>{{ produit.get_unite_display }}</td></tr>
+                    <tr><th>Date d'expiration</th><td>{{ produit.date_expiration|date:"d/m/Y"|default:"Non définie" }}</td></tr>
+                    <tr><th>Description</th><td>{{ produit.description|default:"Aucune description" }}</td></tr>
+                </table>
+            </div>
+        </div>
+        <div class="mt-3">
+            <a href="{% url 'modifier_produit' produit.id %}" class="btn btn-primary">✏️ Modifier</a>
+            <a href="{% url 'supprimer_produit' produit.id %}" class="btn btn-danger">🗑️ Supprimer</a>
+            <a href="{% url 'liste_produits' %}" class="btn btn-secondary">Retour à la liste</a>
+        </div>
+    </div>
+</div>
+
+<!-- Historique des ventes -->
+<div class="card mb-4">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="fas fa-chart-line"></i> Dernières ventes de ce produit</h5>
+    </div>
+    <div class="card-body">
+        {% if ventes %}
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead>
+                    <tr><th>N° vente</th><th>Quantité</th><th>Prix unitaire</th><th>Client</th><th>Date</th></tr>
+                </thead>
+                <tbody>
+                    {% for v in ventes %}
+                    <tr>
+                        <td>{{ v.vente.numero }}</td>
+                        <td>{{ v.quantite }}</td>
+                        <td>{{ v.prix|floatformat:0 }} FCFA</td>
+                        <td>{{ v.vente.client|default:"Anonyme" }}</td>
+                        <td>{{ v.vente.date_vente|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>Aucune vente enregistrée pour ce produit.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Historique des achats -->
+<div class="card">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="fas fa-truck"></i> Derniers achats de ce produit</h5>
+    </div>
+    <div class="card-body">
+        {% if achats %}
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead>
+                    <tr><th>Fournisseur</th><th>Quantité</th><th>Prix unitaire</th><th>Date</th></tr>
+                </thead>
+                <tbody>
+                    {% for a in achats %}
+                    <tr>
+                        <td>{{ a.achat.fournisseur.nom }}</td>
+                        <td>{{ a.quantite }}</td>
+                        <td>{{ a.prix|floatformat:0 }} FCFA</td>
+                        <td>{{ a.achat.date_commande|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>Aucun achat enregistré pour ce produit.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

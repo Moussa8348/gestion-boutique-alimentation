@@ -1,0 +1,59 @@
+{% extends 'shop/base.html' %}
+
+{% block page_title %}Gestion des catégories{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-tags"></i> Liste des catégories</h5>
+        <a href="{% url 'ajouter_categorie' %}" class="btn btn-light btn-sm">➕ Ajouter</a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Image</th>
+                        <th>Nom</th>
+                        <th>Slug</th>
+                        <th>Description</th>
+                        <th>Nb produits</th>
+                        <th>Date création</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cat in categories %}
+                    <tr>
+                        <td>
+                            {% if cat.image %}
+                                <img src="{{ cat.image.url }}" width="40" height="40" style="object-fit: cover; border-radius: 8px;">
+                            {% else %}
+                                <i class="fas fa-tag fa-2x text-muted"></i>
+                            {% endif %}
+                        </td>
+                        <td><strong>{{ cat.nom }}</strong></td>
+                        <td><code>{{ cat.slug }}</code></td>
+                        <td>{{ cat.description|truncatechars:50|default:"-" }}</td>
+                        <td>{{ cat.produits.count }}</small></td>
+                        <td>{{ cat.date_creation|date:"d/m/Y" }}</small></td>
+                        <td>
+                            <a href="{% url 'modifier_categorie' cat.id %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            {% if cat.produits.count == 0 %}
+                            <a href="{% url 'supprimer_categorie' cat.id %}" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center">Aucune catégorie</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

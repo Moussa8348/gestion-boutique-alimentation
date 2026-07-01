@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Connexion - Boutique Alimentation</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;justify-content:center;align-items:center;}
+        .login-container{background:white;border-radius:15px;width:420px;padding:40px;}
+        .login-header{text-align:center;margin-bottom:30px;}
+        .form-group{margin-bottom:20px;}
+        .form-group input{width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;}
+        button{width:100%;padding:12px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:8px;cursor:pointer;}
+        .alert{padding:10px;border-radius:8px;margin-bottom:15px;}
+        .alert-error{background:#f8d7da;color:#721c24;}
+        .alert-success{background:#d4edda;color:#155724;}
+        .forgot-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+        .forgot-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .forgot-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header"><h2>🏪 Boutique Alimentation</h2><p>Connectez-vous</p></div>
+        {% if messages %}{% for message in messages %}<div class="alert alert-{{ message.tags }}">{{ message }}</div>{% endfor %}{% endif %}
+        <form method="post">{% csrf_token %}
+            <div class="form-group"><input type="text" name="username" placeholder="Nom d'utilisateur" required autofocus></div>
+            <div class="form-group"><input type="password" name="password" placeholder="Mot de passe" required></div>
+            <button type="submit">Se connecter</button>
+        </form>
+        <div class="forgot-link">
+            <a href="{% url 'custom_password_reset' %}">Mot de passe oublié ?</a>
+        </div>
+    </div>
+</body>
+</html>

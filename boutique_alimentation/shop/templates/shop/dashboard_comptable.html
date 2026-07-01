@@ -1,0 +1,106 @@
+{% extends 'shop/base.html' %}
+
+{% block page_title %}Dashboard Comptable{% endblock %}
+
+{% block content %}
+<div class="card text-white mb-4" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+    <div class="card-body">
+        <h2><i class="fas fa-chart-line"></i> Tableau de bord comptable</h2>
+        <p>Bienvenue {{ user.username }} – Indicateurs financiers de la boutique.</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <h2 class="text-primary"><i class="fas fa-chart-line"></i></h2>
+            <h3>{{ ca_total|floatformat:0 }} FCFA</h3>
+            <p class="text-muted">Chiffre d'affaires total</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <h2 class="text-danger"><i class="fas fa-shopping-cart"></i></h2>
+            <h3>{{ depenses_total|floatformat:0 }} FCFA</h3>
+            <p class="text-muted">Dépenses totales</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <h2 class="text-success"><i class="fas fa-coins"></i></h2>
+            <h3>{{ benefice_total|floatformat:0 }} FCFA</h3>
+            <p class="text-muted">Bénéfice total</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <h2 class="text-info"><i class="fas fa-percent"></i></h2>
+            <h3>{{ marge|floatformat:1 }}%</h3>
+            <p class="text-muted">Marge bénéficiaire</p>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card text-center p-3">
+            <h3 class="text-info"><i class="fas fa-calendar-day"></i> Aujourd'hui</h3>
+            <h4>{{ ca_jour|floatformat:0 }} FCFA</h4>
+            <p class="text-muted">CA du jour</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center p-3">
+            <h3 class="text-info"><i class="fas fa-calendar-alt"></i> Ce mois</h3>
+            <h4>{{ ca_mois|floatformat:0 }} FCFA</h4>
+            <p>Ventes : {{ ca_mois|floatformat:0 }} FCFA</p>
+            <p>Dépenses : {{ depenses_mois|floatformat:0 }} FCFA</p>
+            <p class="text-success">Bénéfice : {{ benefice_mois|floatformat:0 }} FCFA</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center p-3">
+            <h3 class="text-info"><i class="fas fa-chart-simple"></i> Panier moyen</h3>
+            <h4>{{ panier_moyen|floatformat:0 }} FCFA</h4>
+            <p class="text-muted">par vente</p>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-chart-line"></i> Évolution du chiffre d'affaires (6 derniers mois)</h5>
+    </div>
+    <div class="card-body">
+        <canvas id="caChart" style="height: 300px;"></canvas>
+    </div>
+</div>
+
+<div class="mt-3 text-center">
+    <a href="{% url 'liste_ventes' %}" class="btn btn-primary">Voir toutes les ventes</a>
+    <a href="{% url 'liste_achats' %}" class="btn btn-danger">Voir tous les achats</a>
+    <a href="#" class="btn btn-success">Exporter les rapports (PDF/Excel)</a>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const data = {{ ca_par_mois|safe }};
+    new Chart(document.getElementById('caChart'), {
+        type: 'line',
+        data: {
+            labels: data.map(item => item.mois),
+            datasets: [{
+                label: 'Chiffre d\'affaires (FCFA)',
+                data: data.map(item => item.ca),
+                borderColor: '#2a5298',
+                backgroundColor: 'rgba(42,82,152,0.1)',
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: true }
+    });
+</script>
+{% endblock %}

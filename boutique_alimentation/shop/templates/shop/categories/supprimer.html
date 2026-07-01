@@ -1,0 +1,26 @@
+{% extends 'shop/base.html' %}
+
+{% block page_title %}Supprimer {{ categorie.nom }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0">🗑️ Confirmation</h5>
+    </div>
+    <div class="card-body">
+        <p>Voulez-vous vraiment supprimer la catégorie <strong>{{ categorie.nom }}</strong> ?</p>
+        {% if categorie.produits.count > 0 %}
+            <div class="alert alert-danger">
+                Impossible de supprimer cette catégorie car elle contient {{ categorie.produits.count }} produit(s).
+            </div>
+            <a href="{% url 'liste_categories' %}" class="btn btn-secondary">Retour</a>
+        {% else %}
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Confirmer la suppression</button>
+                <a href="{% url 'liste_categories' %}" class="btn btn-secondary">Annuler</a>
+            </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

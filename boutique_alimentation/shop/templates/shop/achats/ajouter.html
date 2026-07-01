@@ -1,0 +1,159 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block page_title %}Nouvel achat{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="fas fa-cart-plus"></i> Nouvel achat (Réapprovisionnement)</h5>
+    </div>
+    <div class="card-body">
+        <form method="post" id="achatForm">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <label>Fournisseur *</label>
+                    <select name="fournisseur" class="form-control" required>
+                        <option value="">Sélectionner un fournisseur</option>
+                        {% for f in fournisseurs %}
+                        <option value="{{ f.id }}">{{ f.nom }} - {{ f.ville }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <h5 class="mt-3 mb-3"><i class="fas fa-box"></i> Produits commandés</h5>
+            
+            <div id="produits-container">
+                <div class="row produit-item mb-2 align-items-end">
+                    <div class="col-md-5">
+                        <label>Produit</label>
+                        <select name="produits" class="form-control produit-select" required>
+                            <option value="">Sélectionner un produit</option>
+                            {% for p in produits %}
+                            <option value="{{ p.id }}" data-prix="{{ p.prix_achat }}">
+                                {{ p.nom }} - Prix achat: {{ p.prix_achat }} FCFA (Stock: {{ p.quantite_stock }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Quantité</label>
+                        <input type="number" name="quantites" class="form-control quantite-input" min="1" value="1" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Prix unitaire (FCFA)</label>
+                        <input type="number" name="prix" class="form-control prix-input" step="0.01" placeholder="Auto">
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-danger btn-sm supprimer-produit" style="margin-top: 31px;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="button" class="btn btn-secondary btn-sm mb-3" id="ajouter-produit">
+                <i class="fas fa-plus"></i> Ajouter un produit
+            </button>
+            
+            <div class="row mt-3">
+                <div class="col-md-6 offset-md-6">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h4>Total : <span id="total-general">0</span> FCFA</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-check"></i> Valider l'achat
+                </button>
+                <a href="{% url 'liste_achats' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Ajouter une ligne
+    document.getElementById('ajouter-produit').addEventListener('click', function() {
+        const container = document.getElementById('produits-container');
+        const template = document.querySelector('.produit-item').cloneNode(true);
+        
+        template.querySelector('.produit-select').value = '';
+        template.querySelector('.quantite-input').value = '1';
+        template.querySelector('.prix-input').value = '';
+        
+        container.appendChild(template);
+        recalculerTotal();
+    });
+    
+    // Supprimer une ligne
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('supprimer-produit') || e.target.parentElement.classList.contains('supprimer-produit')) {
+            const btn = e.target.classList.contains('supprimer-produit') ? e.target : e.target.parentElement;
+            const items = document.querySelectorAll('.produit-item');
+            if (items.length > 1) {
+                btn.closest('.produit-item').remove();
+                recalculerTotal();
+            } else {
+                alert('Vous devez avoir au moins un produit');
+            }
+        }
+    });
+    
+    // Auto-remplir le prix avec le prix d'achat
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('produit-select')) {
+            const select = e.target;
+            const prixAchat = select.options[select.selectedIndex]?.getAttribute('data-prix') || 0;
+            const prixInput = select.closest('.produit-item').querySelector('.prix-input');
+            if (prixAchat && !prixInput.value) {
+                prixInput.value = prixAchat;
+            }
+            recalculerTotal();
+        }
+        if (e.target.classList.contains('quantite-input') || e.target.classList.contains('prix-input')) {
+            recalculerTotal();
+        }
+    });
+    
+    function recalculerTotal() {
+        let totalGeneral = 0;
+        document.querySelectorAll('.produit-item').forEach(item => {
+            const quantite = item.querySelector('.quantite-input').value;
+            const prix = item.querySelector('.prix-input').value;
+            const sousTotal = quantite * prix;
+            totalGeneral += sousTotal;
+        });
+        document.getElementById('total-general').innerText = totalGeneral.toLocaleString();
+    }
+    
+    // Validation
+    document.getElementById('achatForm').addEventListener('submit', function(e) {
+        let hasError = false;
+        document.querySelectorAll('.produit-item').forEach(item => {
+            if (!item.querySelector('.produit-select').value) {
+                alert('Veuillez sélectionner un produit');
+                hasError = true;
+            }
+        });
+        if (!document.querySelector('select[name="fournisseur"]').value) {
+            alert('Veuillez sélectionner un fournisseur');
+            hasError = true;
+        }
+        if (hasError) {
+            e.preventDefault();
+        }
+    });
+</script>
+
+{% endblock %}

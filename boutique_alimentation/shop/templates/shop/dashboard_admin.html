@@ -1,0 +1,504 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block page_title %}Dashboard Administrateur{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hero section Admin */
+    .admin-hero {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        border-radius: 24px;
+        padding: 30px;
+        margin-bottom: 30px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .admin-hero::before {
+        content: "👑";
+        position: absolute;
+        right: 20px;
+        bottom: 10px;
+        font-size: 80px;
+        opacity: 0.1;
+    }
+    
+    .admin-hero h1 {
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+    }
+    
+    /* Cartes statistiques */
+    .stats-grid-admin {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card-admin {
+        background: white;
+        border-radius: 20px;
+        padding: 20px;
+        transition: transform 0.2s;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    
+    .stat-card-admin:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .stat-icon-admin {
+        width: 50px;
+        height: 50px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    
+    .stat-icon-admin.ventes { background: #e3f2fd; color: #1976d2; }
+    .stat-icon-admin.ca { background: #e8f5e9; color: #388e3c; }
+    .stat-icon-admin.produits { background: #fff3e0; color: #f57c00; }
+    .stat-icon-admin.users { background: #fce4ec; color: #c62828; }
+    
+    .stat-number-admin {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1a1a2e;
+    }
+    
+    .stat-label-admin {
+        color: #666;
+        font-size: 0.8rem;
+        margin-top: 5px;
+    }
+    
+    /* Section graphique */
+    .chart-container {
+        background: white;
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    
+    .chart-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #333;
+    }
+    
+    /* Actions rapides admin */
+    .admin-actions {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .admin-action-card {
+        background: white;
+        border-radius: 16px;
+        padding: 15px;
+        text-align: center;
+        text-decoration: none;
+        color: #333;
+        transition: all 0.2s;
+        border: 1px solid #f0f0f0;
+    }
+    
+    .admin-action-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    
+    .admin-action-icon {
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+    }
+    
+    .admin-action-title {
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    /* Tableaux */
+    .section-card {
+        background: white;
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .section-header h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    /* Alertes */
+    .alert-card {
+        background: #fff3cd;
+        border: 1px solid #ffeeba;
+        border-radius: 16px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .alert-danger-card {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: 16px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    /* Badges */
+    .badge-admin {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+    }
+    
+    .badge-admin-danger { background: #f8d7da; color: #721c24; }
+    .badge-admin-warning { background: #fff3cd; color: #856404; }
+    .badge-admin-success { background: #d4edda; color: #155724; }
+    
+    /* Responsive */
+    @media (max-width: 992px) {
+        .stats-grid-admin {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .admin-actions {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .stats-grid-admin {
+            grid-template-columns: 1fr;
+        }
+        .admin-actions {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    .table-responsive-custom {
+        overflow-x: auto;
+    }
+    
+    .table-custom {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .table-custom th {
+        padding: 12px;
+        text-align: left;
+        background: #f8f9fa;
+        font-weight: 600;
+        font-size: 0.8rem;
+    }
+    
+    .table-custom td {
+        padding: 12px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .btn-sm-custom {
+        padding: 5px 12px;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-primary-custom { background: #667eea; color: white; border: none; }
+    .btn-danger-custom { background: #dc3545; color: white; border: none; }
+    
+    .btn-sm-custom:hover { opacity: 0.8; color: white; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero section Admin -->
+<div class="admin-hero">
+    <h1><i class="fas fa-crown"></i> Dashboard Administrateur</h1>
+    <p>Bienvenue {{ user.username }} ! Vous avez le contrôle total sur la boutique.</p>
+    <div class="row mt-3">
+        <div class="col-auto">
+            <div class="bg-white bg-opacity-25 rounded p-2">
+                <small>👥 Utilisateurs</small><br>
+                <strong>{{ total_utilisateurs }} inscrits</strong>
+            </div>
+        </div>
+        <div class="col-auto">
+            <div class="bg-white bg-opacity-25 rounded p-2">
+                <small>📦 Produits</small><br>
+                <strong>{{ total_produits }} en stock</strong>
+            </div>
+        </div>
+        <div class="col-auto">
+            <div class="bg-white bg-opacity-25 rounded p-2">
+                <small>💰 CA Total</small><br>
+                <strong>{{ ca_total|floatformat:0 }} FCFA</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cartes statistiques -->
+<div class="stats-grid-admin">
+    <div class="stat-card-admin">
+        <div class="stat-header">
+            <div class="stat-icon-admin ventes"><i class="fas fa-shopping-cart"></i></div>
+            <span class="stat-number-admin">{{ total_ventes }}</span>
+        </div>
+        <div class="stat-label-admin">Ventes totales</div>
+    </div>
+    <div class="stat-card-admin">
+        <div class="stat-header">
+            <div class="stat-icon-admin ca"><i class="fas fa-chart-line"></i></div>
+            <span class="stat-number-admin">{{ ca_total|floatformat:0 }} FCFA</span>
+        </div>
+        <div class="stat-label-admin">Chiffre d'affaires total</div>
+    </div>
+    <div class="stat-card-admin">
+        <div class="stat-header">
+            <div class="stat-icon-admin produits"><i class="fas fa-boxes"></i></div>
+            <span class="stat-number-admin">{{ total_produits }}</span>
+        </div>
+        <div class="stat-label-admin">Produits en stock</div>
+    </div>
+    <div class="stat-card-admin">
+        <div class="stat-header">
+            <div class="stat-icon-admin users"><i class="fas fa-users"></i></div>
+            <span class="stat-number-admin">{{ total_utilisateurs }}</span>
+        </div>
+        <div class="stat-label-admin">Utilisateurs</div>
+    </div>
+</div>
+
+<!-- Actions rapides Admin -->
+<div class="admin-actions">
+    <a href="{% url 'liste_produits' %}" class="admin-action-card">
+        <div class="admin-action-icon">📦</div>
+        <div class="admin-action-title">Gérer produits</div>
+    </a>
+    <a href="{% url 'liste_utilisateurs' %}" class="admin-action-card">
+        <div class="admin-action-icon">👥</div>
+        <div class="admin-action-title">Gérer utilisateurs</div>
+    </a>
+    <a href="{% url 'liste_fournisseurs' %}" class="admin-action-card">
+        <div class="admin-action-icon">🤝</div>
+        <div class="admin-action-title">Fournisseurs</div>
+    </a>
+    <a href="{% url 'config_app' %}" class="admin-action-card">
+        <div class="admin-action-icon">⚙️</div>
+        <div class="admin-action-title">Configuration</div>
+    </a>
+    <a href="#" class="admin-action-card" id="backupBtn">
+        <div class="admin-action-icon">💾</div>
+        <div class="admin-action-title">Backup BDD</div>
+    </a>
+</div>
+
+<!-- Alertes importantes -->
+{% if produits_rupture > 0 or produits_alerte > 0 %}
+<div class="section-card" style="background: #fff3cd;">
+    <div class="section-header">
+        <h3><i class="fas fa-bell"></i> Alertes importantes</h3>
+    </div>
+    <div class="row">
+        {% if produits_rupture > 0 %}
+        <div class="col-md-6">
+            <div class="alert-danger-card" style="margin-bottom: 0;">
+                <strong>🔴 Produits en rupture ({{ produits_rupture }})</strong>
+                <ul class="mt-2 mb-0">
+                    {% for p in produits_rupture_liste|slice:":3" %}
+                    <li>{{ p.nom }}</li>
+                    {% endfor %}
+                    {% if produits_rupture > 3 %}<li>...</li>{% endif %}
+                </ul>
+                <a href="{% url 'liste_produits' %}?statut=out" class="btn btn-sm btn-danger mt-2">Voir tout</a>
+            </div>
+        </div>
+        {% endif %}
+        {% if produits_alerte > 0 %}
+        <div class="col-md-6">
+            <div class="alert-card" style="margin-bottom: 0;">
+                <strong>🟠 Stock faible ({{ produits_alerte }})</strong>
+                <ul class="mt-2 mb-0">
+                    {% for p in produits_alerte_liste|slice:":3" %}
+                    <li>{{ p.nom }} ({{ p.quantite_stock }} restants)</li>
+                    {% endfor %}
+                    {% if produits_alerte > 3 %}<li>...</li>{% endif %}
+                </ul>
+                <a href="{% url 'liste_produits' %}?statut=low" class="btn btn-sm btn-warning mt-2">Voir tout</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Graphique CA mensuel -->
+<div class="chart-container">
+    <div class="chart-title">
+        <i class="fas fa-chart-line"></i> Évolution du chiffre d'affaires (6 derniers mois)
+    </div>
+    <canvas id="salesChart" style="height: 300px; width: 100%;"></canvas>
+</div>
+
+<!-- Derniers utilisateurs -->
+<div class="section-card">
+    <div class="section-header">
+        <h3><i class="fas fa-user-plus"></i> Derniers utilisateurs inscrits</h3>
+        <a href="{% url 'liste_utilisateurs' %}" class="btn-sm-custom btn-primary-custom">Voir tout</a>
+    </div>
+    <div class="table-responsive-custom">
+        <table class="table-custom">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Rôle</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in derniers_utilisateurs %}
+                <tr>
+                    <td><strong>{{ u.username }}</strong>{% if u.is_superuser %} <span class="badge-admin badge-admin-danger">Admin</span>{% endif %}</strong></td>
+                    <td>{{ u.email|default:"-" }}</td>
+                    <td>{% if u.profil.role == 'admin' %}👑 Administrateur{% else %}📋 Gérant{% endif %}</td>
+                    <td>{{ u.date_joined|date:"d/m/Y" }}</td>
+                    <td>
+                        <a href="{% url 'modifier_utilisateur' u.id %}" class="btn-sm-custom btn-primary-custom" style="display: inline-block; margin-right: 5px;">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        {% if u != user %}
+                        <a href="{% url 'supprimer_utilisateur' u.id %}" class="btn-sm-custom btn-danger-custom" style="display: inline-block;">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5">Aucun utilisateur</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Dernières ventes -->
+<div class="section-card">
+    <div class="section-header">
+        <h3><i class="fas fa-receipt"></i> Dernières ventes (global)</h3>
+        <a href="{% url 'liste_ventes' %}" class="btn-sm-custom btn-primary-custom">Voir tout</a>
+    </div>
+    <div class="table-responsive-custom">
+        <table class="table-custom">
+            <thead>
+                <tr>
+                    <th>N° Vente</th>
+                    <th>Client</th>
+                    <th>Montant</th>
+                    <th>Agent</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for v in dernieres_ventes %}
+                <tr>
+                    <td>{{ v.numero }}</td>
+                    <td>{{ v.client|default:"Anonyme" }}</td>
+                    <td><strong>{{ v.total|floatformat:0 }} FCFA</strong></td>
+                    <td>{{ v.agent.username }}</td>
+                    <td>{{ v.date_vente|date:"d/m/Y H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5">Aucune vente</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Graphique des ventes
+    const ventesParMois = {{ ventes_par_mois|safe }};
+    
+    const ctx = document.getElementById('salesChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ventesParMois.map(item => item.mois),
+            datasets: [{
+                label: 'Chiffre d\'affaires (FCFA)',
+                data: ventesParMois.map(item => item.total),
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString() + ' FCFA';
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Backup
+    document.getElementById('backupBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        if(confirm('Voulez-vous faire une sauvegarde de la base de données ?')) {
+            window.location.href = '/backup/';
+        }
+    });
+</script>
+{% endblock %}

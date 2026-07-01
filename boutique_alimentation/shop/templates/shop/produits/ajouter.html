@@ -1,0 +1,102 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block page_title %}Ajouter un produit{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="fas fa-plus"></i> Ajouter un produit</h5>
+    </div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label>Nom du produit *</label>
+                    <input type="text" name="nom" class="form-control" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label>Unité</label>
+                    <select name="unite" class="form-control">
+                        <option value="pcs">Pièce</option>
+                        <option value="kg">Kilogramme</option>
+                        <option value="l">Litre</option>
+                        <option value="box">Boîte</option>
+                        <option value="pack">Pack</option>
+                        <option value="g">Gramme</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label>Catégorie</label>
+                    <select name="categorie" class="form-control">
+                        <option value="">Sélectionner</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.id }}">{{ cat.nom }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label>Fournisseur</label>
+                    <select name="fournisseur" class="form-control">
+                        <option value="">Sélectionner</option>
+                        {% for four in fournisseurs %}
+                        <option value="{{ four.id }}">{{ four.nom }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label>Prix d'achat (FCFA)</label>
+                    <input type="number" name="prix_achat" class="form-control" step="0.01" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label>Prix de vente (FCFA)</label>
+                    <input type="number" name="prix_vente" class="form-control" step="0.01" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label>Quantité en stock</label>
+                    <input type="number" name="quantite_stock" class="form-control" value="0">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label>Stock minimum d'alerte</label>
+                    <input type="number" name="stock_min" class="form-control" value="5">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label>Date d'expiration</label>
+                    <input type="date" name="date_expiration" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label>SKU (Code unique)</label>
+                    <input type="text" name="sku" class="form-control" placeholder="Optionnel">
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label>Description</label>
+                    <textarea name="description" class="form-control" rows="3" placeholder="Description du produit..."></textarea>
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label>Image du produit</label>
+                    <input type="file" name="image" class="form-control" accept="image/*">
+                </div>
+                <div class="col-md-12 mb-3">
+                    <div class="form-check">
+                        <input type="checkbox" name="is_active" class="form-check-input" checked>
+                        <label class="form-check-label">Produit actif (visible dans les ventes)</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i> Enregistrer
+                </button>
+                <a href="{% url 'liste_produits' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

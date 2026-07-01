@@ -1,0 +1,62 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block page_title %}Ajouter un fournisseur{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="fas fa-plus"></i> Ajouter un fournisseur</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label>Nom complet *</label>
+                    <input type="text" name="nom" class="form-control" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label>Email</label>
+                    <input type="email" name="email" class="form-control">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label>Téléphone *</label>
+                    <input type="text" name="phone" class="form-control" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label>Adresse</label>
+                    <input type="text" name="adresse" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label>Ville</label>
+                    <input type="text" name="ville" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label>Pays</label>
+                    <input type="text" name="pays" class="form-control" value="Mali">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label>Statut</label>
+                    <select name="actif" class="form-control">
+                        <option value="on">Actif</option>
+                        <option value="off">Inactif</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i> Enregistrer
+                </button>
+                <a href="{% url 'liste_fournisseurs' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

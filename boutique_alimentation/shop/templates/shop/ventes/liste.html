@@ -1,0 +1,190 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block page_title %}Gestion des Ventes{% endblock %}
+
+{% block content %}
+
+<!-- Bannière -->
+<div class="card text-white mb-4" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+    <div class="card-body">
+        <h2><i class="fas fa-shopping-cart"></i> Gestion des Ventes</h2>
+        <p>Enregistrez et suivez toutes vos ventes en temps réel</p>
+    </div>
+</div>
+
+<!-- Cartes statistiques -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card text-center p-3">
+            <h2 class="text-info"><i class="fas fa-calendar-day"></i></h2>
+            <h3>{{ ca_jour|floatformat:0 }} FCFA</h3>
+            <p class="text-muted">Aujourd'hui</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center p-3">
+            <h2 class="text-primary"><i class="fas fa-calendar-week"></i></h2>
+            <h3>{{ ca_semaine|floatformat:0 }} FCFA</h3>
+            <p class="text-muted">Cette semaine</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center p-3">
+            <h2 class="text-success"><i class="fas fa-calendar-alt"></i></h2>
+            <h3>{{ ca_mois|floatformat:0 }} FCFA</h3>
+            <p class="text-muted">Ce mois</p>
+        </div>
+    </div>
+</div>
+
+<!-- Barre de recherche et filtres -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <input type="text" id="searchInput" class="form-control" placeholder="🔍 Rechercher par n° vente ou client..." value="{{ search }}">
+            </div>
+            <div class="col-md-3">
+                <input type="date" id="dateDebut" class="form-control" value="{{ date_debut }}" placeholder="Date début">
+            </div>
+            <div class="col-md-3">
+                <input type="date" id="dateFin" class="form-control" value="{{ date_fin }}" placeholder="Date fin">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100" id="searchBtn">
+                    <i class="fas fa-search"></i> Filtrer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bouton nouvelle vente -->
+<div class="mb-3">
+    <a href="{% url 'nouvelle_vente' %}" class="btn btn-success">
+        <i class="fas fa-plus"></i> Nouvelle vente
+    </a>
+</div>
+
+<!-- Tableau des ventes -->
+<div class="card">
+    <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="fas fa-list"></i> Liste des ventes</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>N° Vente</th>
+                        <th>Client</th>
+                        <th>Articles</th>
+                        <th>Montant</th>
+                        <th>Paiement</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vente in ventes %}
+                    <tr>
+                        <td><strong>{{ vente.numero }}</strong></td>
+                        <td>{{ vente.client|default:"Client anonyme" }}</small></td>
+                        <td>
+                            <span class="badge bg-secondary">{{ vente.lignes.count }} article(s)</span>
+                        </small></td>
+                        <td>
+                            <strong class="text-success">{{ vente.total|floatformat:0 }} FCFA</strong>
+                        </small></td>
+                        <td>
+                            {% if vente.mode_paiement == 'especes' %}
+                                <span class="badge bg-success">💰 Espèces</span>
+                            {% elif vente.mode_paiement == 'carte' %}
+                                <span class="badge bg-info">💳 Carte</span>
+                            {% else %}
+                                <span class="badge bg-warning">📱 Mobile</span>
+                            {% endif %}
+                        </small></td>
+                        <td>{{ vente.date_vente|date:"d/m/Y H:i" }}</small></td>
+                        <td>
+                            <a href="{% url 'detail_vente' vente.id %}" class="btn btn-sm btn-info" title="Voir détail">
+    <i class="fas fa-eye"></i>
+</a>
+                            <a href="#" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-print"></i>
+                            </a>
+                        </small></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
+                            <p>Aucune vente enregistrée</p>
+                            <a href="{% url 'nouvelle_vente' %}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Nouvelle vente
+                            </a>
+                        </small></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if ventes.has_other_pages %}
+        <nav class="mt-3">
+            <ul class="pagination justify-content-center">
+                {% if ventes.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ ventes.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if date_debut %}&date_debut={{ date_debut }}{% endif %}{% if date_fin %}&date_fin={{ date_fin }}{% endif %}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% for num in ventes.paginator.page_range %}
+                <li class="page-item {% if ventes.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if date_debut %}&date_debut={{ date_debut }}{% endif %}{% if date_fin %}&date_fin={{ date_fin }}{% endif %}">
+                        {{ num }}
+                    </a>
+                </li>
+                {% endfor %}
+                
+                {% if ventes.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ ventes.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if date_debut %}&date_debut={{ date_debut }}{% endif %}{% if date_fin %}&date_fin={{ date_fin }}{% endif %}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Recherche et filtres
+    document.getElementById('searchBtn').addEventListener('click', function() {
+        const search = document.getElementById('searchInput').value;
+        const dateDebut = document.getElementById('dateDebut').value;
+        const dateFin = document.getElementById('dateFin').value;
+        
+        let url = '?';
+        if (search) url += `search=${search}&`;
+        if (dateDebut) url += `date_debut=${dateDebut}&`;
+        if (dateFin) url += `date_fin=${dateFin}&`;
+        
+        window.location.href = url.slice(0, -1);
+    });
+    
+    // Recherche avec touche Entrée
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            document.getElementById('searchBtn').click();
+        }
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'shop/base.html' %}
+
+{% block page_title %}Ajouter un utilisateur{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">➕ Ajouter un utilisateur</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label>Nom d'utilisateur *</label>
+                    <input type="text" name="username" class="form-control" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label>Email</label>
+                    <input type="email" name="email" class="form-control">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label>Mot de passe *</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label>Rôle</label>
+                    <select name="role" class="form-control">
+                        <option value="manager">📋 Gérant</option>
+                        <option value="admin">👑 Administrateur</option>
+                        <option value="comptable">💰 Comptable</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success">Créer</button>
+            <a href="{% url 'liste_utilisateurs' %}" class="btn btn-secondary">Annuler</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

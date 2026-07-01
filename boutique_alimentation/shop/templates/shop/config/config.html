@@ -1,0 +1,108 @@
+{% extends 'shop/base.html' %}
+
+{% block page_title %}Configuration de l'application{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-cog"></i> Configuration de l'application</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-globe"></i> Langue</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for langue in langues %}
+                            <div class="col-md-4 mb-2">
+                                <button class="btn btn-outline-primary w-100 langue-btn" data-langue="{{ langue.code }}">
+                                    {{ langue.flag }} {{ langue.nom }}
+                                </button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div id="langue-message" class="alert alert-info mt-3" style="display: none;">
+                            Langue changée. Rafraîchissez la page.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0"><i class="fas fa-palette"></i> Thème</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for theme in themes %}
+                            <div class="col-md-4 mb-2">
+                                <button class="btn btn-outline-secondary w-100 theme-btn" data-theme="{{ theme.code }}">
+                                    {{ theme.icon }} {{ theme.nom }}
+                                </button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card mt-3">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-store"></i> Informations de la boutique</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" id="boutiqueForm">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label>Nom de la boutique</label>
+                            <input type="text" name="nom_boutique" class="form-control" value="Boutique Alimentation">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Téléphone</label>
+                            <input type="text" name="telephone" class="form-control" value="+223 XX XX XX XX">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Email</label>
+                            <input type="email" name="email" class="form-control" value="contact@boutique.com">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Adresse</label>
+                            <input type="text" name="adresse" class="form-control" value="Bamako, Mali">
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label>Description</label>
+                            <textarea name="description" class="form-control" rows="3">Application de gestion de boutique d'alimentation</textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">Enregistrer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.querySelectorAll('.langue-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            localStorage.setItem('app_langue', this.dataset.langue);
+            document.getElementById('langue-message').style.display = 'block';
+            setTimeout(() => location.reload(), 1000);
+        });
+    });
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const theme = this.dataset.theme;
+            localStorage.setItem('app_theme', theme);
+            if (theme === 'dark') document.body.style.background = '#1a1a2e';
+            else if (theme === 'blue') document.body.style.background = '#e3f2fd';
+            else document.body.style.background = '#f0f2f5';
+        });
+    });
+    const savedTheme = localStorage.getItem('app_theme');
+    if (savedTheme === 'dark') document.body.style.background = '#1a1a2e';
+    else if (savedTheme === 'blue') document.body.style.background = '#e3f2fd';
+</script>
+{% endblock %}

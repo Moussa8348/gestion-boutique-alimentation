@@ -1,0 +1,30 @@
+{% extends 'shop/base.html' %}
+
+{% block page_title %}Désactiver {{ produit.nom }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0"><i class="fas fa-archive"></i> Désactiver le produit</h5>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            Attention ! Désactiver ce produit le rendra indisponible à la vente.
+        </div>
+        
+        <p>Voulez-vous vraiment désactiver le produit <strong>{{ produit.nom }}</strong> ?</p>
+        <p>Il ne pourra plus être ajouté aux nouvelles ventes, mais l'historique restera.</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-warning">
+                <i class="fas fa-archive"></i> Désactiver
+            </button>
+            <a href="{% url 'liste_produits' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Annuler
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,574 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block page_title %}Gestion des Produits{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hero section */
+    .products-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 24px;
+        padding: 30px;
+        margin-bottom: 30px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .products-hero::before {
+        content: "📦📦📦";
+        position: absolute;
+        right: 20px;
+        bottom: 10px;
+        font-size: 80px;
+        opacity: 0.1;
+    }
+    
+    .products-hero h1 {
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+    }
+    
+    /* Cartes de statistiques */
+    .stat-cards {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card-prod {
+        background: white;
+        border-radius: 20px;
+        padding: 20px;
+        text-align: center;
+        transition: all 0.3s;
+        cursor: pointer;
+        border: 2px solid transparent;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    
+    .stat-card-prod:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    .stat-card-prod.active {
+        border-color: #667eea;
+        background: linear-gradient(135deg, #f0f4ff 0%, #fff 100%);
+    }
+    
+    .stat-card-prod.all .stat-icon { background: #6c757d; }
+    .stat-card-prod.available .stat-icon { background: #28a745; }
+    .stat-card-prod.low .stat-icon { background: #ffc107; }
+    .stat-card-prod.out .stat-icon { background: #dc3545; }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        font-size: 1.8rem;
+        color: white;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1a1a2e;
+    }
+    
+    .stat-label {
+        color: #666;
+        font-size: 0.85rem;
+        margin-top: 5px;
+    }
+    
+    /* Barre de recherche */
+    .search-section {
+        background: white;
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    
+    .search-wrapper {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+    
+    .search-input-group {
+        flex: 1;
+        position: relative;
+    }
+    
+    .search-input-group i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+    }
+    
+    .search-input-group input {
+        width: 100%;
+        padding: 14px 15px 14px 45px;
+        border: 2px solid #eef2f6;
+        border-radius: 16px;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+    }
+    
+    .search-input-group input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+    
+    .btn-search {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 14px 30px;
+        border-radius: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .btn-search:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+    }
+    
+    .btn-add {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 14px 30px;
+        border-radius: 16px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s;
+    }
+    
+    .btn-add:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(40,167,69,0.4);
+        color: white;
+    }
+    
+    /* Tableau */
+    .products-table-container {
+        background: white;
+        border-radius: 24px;
+        padding: 0;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+    
+    .products-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .products-table thead tr {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .products-table th {
+        padding: 18px 15px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .products-table td {
+        padding: 16px 15px;
+        border-bottom: 1px solid #f0f0f0;
+        vertical-align: middle;
+    }
+    
+    .products-table tr:hover {
+        background: #f8f9ff;
+    }
+    
+    /* Product image */
+    .product-img {
+        width: 55px;
+        height: 55px;
+        border-radius: 12px;
+        object-fit: cover;
+        background: #f5f5f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .product-img-placeholder {
+        width: 55px;
+        height: 55px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    
+    /* Badges */
+    .badge-custom {
+        padding: 6px 14px;
+        border-radius: 30px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+    
+    .badge-available {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        color: #155724;
+    }
+    
+    .badge-low {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%);
+        color: #856404;
+    }
+    
+    .badge-out {
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        color: #721c24;
+    }
+    
+    /* Stock indicator */
+    .stock-indicator {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .stock-bar {
+        width: 60px;
+        height: 6px;
+        background: #e0e0e0;
+        border-radius: 3px;
+        overflow: hidden;
+    }
+    
+    .stock-bar-fill {
+        height: 100%;
+        border-radius: 3px;
+    }
+    
+    .stock-bar-fill.high { background: #28a745; width: 80%; }
+    .stock-bar-fill.medium { background: #ffc107; width: 40%; }
+    .stock-bar-fill.low { background: #dc3545; width: 15%; }
+    
+    /* Action buttons */
+    .action-btns {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .action-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+        text-decoration: none;
+    }
+    
+    .action-btn.view {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+    
+    .action-btn.edit {
+        background: #fff3e0;
+        color: #f57c00;
+    }
+    
+    .action-btn.delete {
+        background: #fce4ec;
+        color: #c62828;
+    }
+    
+    .action-btn:hover {
+        transform: scale(1.1);
+    }
+    
+    /* Pagination */
+    .pagination-custom {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 25px;
+    }
+    
+    .page-item {
+        list-style: none;
+    }
+    
+    .page-link-custom {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: white;
+        color: #333;
+        text-decoration: none;
+        transition: all 0.3s;
+        font-weight: 500;
+    }
+    
+    .page-link-custom:hover {
+        background: #667eea;
+        color: white;
+    }
+    
+    .page-link-custom.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    /* Responsive */
+    @media (max-width: 992px) {
+        .stat-cards {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .stat-cards {
+            grid-template-columns: 1fr;
+        }
+        .search-wrapper {
+            flex-direction: column;
+        }
+        .products-table {
+            font-size: 0.85rem;
+        }
+        .products-table th, .products-table td {
+            padding: 12px 8px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero section -->
+<div class="products-hero">
+    <h1><i class="fas fa-boxes"></i> Gestion des Produits</h1>
+    <p>Gérez votre inventaire et surveillez les niveaux de stock</p>
+</div>
+
+<!-- Cartes statistiques -->
+<div class="stat-cards">
+    <div class="stat-card-prod all {% if not filtre_statut %}active{% endif %}" data-filter="all">
+        <div class="stat-icon">📦</div>
+        <div class="stat-number">{{ total_all }}</div>
+        <div class="stat-label">Tous les produits</div>
+    </div>
+    <div class="stat-card-prod available {% if filtre_statut == 'available' %}active{% endif %}" data-filter="available">
+        <div class="stat-icon">✅</div>
+        <div class="stat-number">{{ total_available }}</div>
+        <div class="stat-label">Disponibles</div>
+    </div>
+    <div class="stat-card-prod low {% if filtre_statut == 'low' %}active{% endif %}" data-filter="low">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-number">{{ total_low_stock }}</div>
+        <div class="stat-label">Stock Faible</div>
+    </div>
+    <div class="stat-card-prod out {% if filtre_statut == 'out' %}active{% endif %}" data-filter="out">
+        <div class="stat-icon">❌</div>
+        <div class="stat-number">{{ total_out_stock }}</div>
+        <div class="stat-label">Rupture</div>
+    </div>
+</div>
+
+<!-- Barre de recherche -->
+<div class="search-section">
+    <div class="search-wrapper">
+        <div class="search-input-group">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Rechercher un produit par nom, SKU ou code barre..." value="{{ search }}">
+        </div>
+        <button class="btn-search" id="searchBtn">
+            <i class="fas fa-search"></i> Rechercher
+        </button>
+        <a href="{% url 'ajouter_produit' %}" class="btn-add">
+            <i class="fas fa-plus"></i> Ajouter un produit
+        </a>
+    </div>
+</div>
+
+<!-- Tableau des produits -->
+<div class="products-table-container">
+    <table class="products-table">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Produit</th>
+                <th>Catégorie</th>
+                <th>Stock</th>
+                <th>Seuil</th>
+                <th>Prix vente</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for produit in produits %}
+            <tr>
+                <td>
+                    {% if produit.image %}
+                    <img src="{{ produit.image.url }}" class="product-img" alt="{{ produit.nom }}">
+                    {% else %}
+                    <div class="product-img-placeholder">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    {% endif %}
+                </td>
+                <td>
+                    <strong>{{ produit.nom }}</strong>
+                    {% if produit.sku %}
+                    <br><small class="text-muted">SKU: {{ produit.sku }}</small>
+                    {% endif %}
+                </td>
+                <td>{{ produit.categorie.nom|default:"-" }}</td>
+                <td>
+                    <div class="stock-indicator">
+                        <span class="stock-number {% if produit.quantite_stock == 0 %}text-danger{% elif produit.stock_faible %}text-warning{% else %}text-success{% endif %}">
+                            {{ produit.quantite_stock }}
+                        </span>
+                        <div class="stock-bar">
+                            <div class="stock-bar-fill 
+                                {% if produit.quantite_stock > produit.stock_min %}high
+                                {% elif produit.quantite_stock > 0 %}medium
+                                {% else %}low{% endif %}">
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td>{{ produit.stock_min }}</td>
+                <td><strong>{{ produit.prix_vente|floatformat:0 }} FCFA</strong></td>
+                <td>
+                    {% if produit.quantite_stock == 0 %}
+                        <span class="badge-custom badge-out">❌ Rupture</span>
+                    {% elif produit.stock_faible %}
+                        <span class="badge-custom badge-low">⚠️ Stock faible</span>
+                    {% else %}
+                        <span class="badge-custom badge-available">✅ Disponible</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="action-btns">
+                       <a href="{% url 'detail_produit' produit.id %}" class="btn btn-sm btn-info" title="Voir détail">
+    <i class="fas fa-eye"></i>
+</a>
+                        <a href="{% url 'modifier_produit' produit.id %}" class="action-btn edit" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'supprimer_produit' produit.id %}" class="action-btn delete" title="Supprimer" onclick="return confirm('Supprimer {{ produit.nom }} ?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center py-5">
+                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                    <p>Aucun produit trouvé</p>
+                    <a href="{% url 'ajouter_produit' %}" class="btn-add">+ Ajouter un produit</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+{% if produits.has_other_pages %}
+<div class="pagination-custom">
+    {% if produits.has_previous %}
+        <a href="?page={{ produits.previous_page_number }}{% if filtre_statut %}&statut={{ filtre_statut }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="page-link-custom">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+    {% endif %}
+    
+    {% for num in produits.paginator.page_range %}
+        {% if produits.number == num %}
+            <span class="page-link-custom active">{{ num }}</span>
+        {% else %}
+            <a href="?page={{ num }}{% if filtre_statut %}&statut={{ filtre_statut }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="page-link-custom">
+                {{ num }}
+            </a>
+        {% endif %}
+    {% endfor %}
+    
+    {% if produits.has_next %}
+        <a href="?page={{ produits.next_page_number }}{% if filtre_statut %}&statut={{ filtre_statut }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="page-link-custom">
+            <i class="fas fa-chevron-right"></i>
+        </a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Filtres par statut
+    document.querySelectorAll('.stat-card-prod').forEach(card => {
+        card.addEventListener('click', function() {
+            const filter = this.dataset.filter;
+            const currentUrl = new URL(window.location.href);
+            if (filter === 'all') {
+                currentUrl.searchParams.delete('statut');
+            } else {
+                currentUrl.searchParams.set('statut', filter);
+            }
+            currentUrl.searchParams.set('page', '1');
+            window.location.href = currentUrl.toString();
+        });
+    });
+    
+    // Recherche
+    document.getElementById('searchBtn').addEventListener('click', function() {
+        const search = document.getElementById('searchInput').value;
+        const currentUrl = new URL(window.location.href);
+        if (search) {
+            currentUrl.searchParams.set('search', search);
+        } else {
+            currentUrl.searchParams.delete('search');
+        }
+        currentUrl.searchParams.set('page', '1');
+        window.location.href = currentUrl.toString();
+    });
+    
+    // Recherche avec Entrée
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            document.getElementById('searchBtn').click();
+        }
+    });
+</script>
+{% endblock %}

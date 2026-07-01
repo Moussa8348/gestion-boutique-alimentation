@@ -1,0 +1,180 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block page_title %}Nouvelle vente{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="fas fa-cash-register"></i> Nouvelle vente</h5>
+    </div>
+    <div class="card-body">
+        <form method="post" id="venteForm">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label>Client (optionnel)</label>
+                    <input type="text" name="client" class="form-control" placeholder="Nom du client">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label>Mode de paiement</label>
+                    <select name="mode_paiement" class="form-control" required>
+                        <option value="especes">💰 Espèces</option>
+                        <option value="carte">💳 Carte bancaire</option>
+                        <option value="moneyElectronique">📱 Mobile money</option>
+                        <option value="cheque">📝 Chèque</option>
+                    </select>
+                </div>
+            </div>
+            
+            <h5 class="mt-3 mb-3"><i class="fas fa-box"></i> Produits</h5>
+            
+            <div id="produits-container">
+                <div class="row produit-item mb-2 align-items-end">
+                    <div class="col-md-5">
+                        <label>Produit</label>
+                        <select name="produits" class="form-control produit-select" required>
+                            <option value="">Sélectionner un produit</option>
+                            {% for p in produits %}
+                            <option value="{{ p.id }}" data-prix="{{ p.prix_vente }}" data-stock="{{ p.quantite_stock }}">
+                                {{ p.nom }} - {{ p.prix_vente }} FCFA (Stock: {{ p.quantite_stock }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Quantité</label>
+                        <input type="number" name="quantites" class="form-control quantite-input" min="1" value="1" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Sous-total</label>
+                        <input type="text" class="form-control sous-total" readonly placeholder="0 FCFA">
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-danger btn-sm supprimer-produit" style="margin-top: 31px;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="button" class="btn btn-secondary btn-sm mb-3" id="ajouter-produit">
+                <i class="fas fa-plus"></i> Ajouter un produit
+            </button>
+            
+            <div class="row mt-3">
+                <div class="col-md-6 offset-md-6">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h4>Total : <span id="total-general">0</span> FCFA</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-check"></i> Valider la vente
+                </button>
+                <a href="{% url 'liste_ventes' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Ajouter une ligne de produit
+    document.getElementById('ajouter-produit').addEventListener('click', function() {
+        const container = document.getElementById('produits-container');
+        const template = document.querySelector('.produit-item').cloneNode(true);
+        
+        // Réinitialiser les valeurs
+        template.querySelector('.produit-select').value = '';
+        template.querySelector('.quantite-input').value = '1';
+        template.querySelector('.sous-total').value = '';
+        
+        container.appendChild(template);
+        recalculerTotal();
+    });
+    
+    // Supprimer une ligne
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('supprimer-produit') || e.target.parentElement.classList.contains('supprimer-produit')) {
+            const btn = e.target.classList.contains('supprimer-produit') ? e.target : e.target.parentElement;
+            const items = document.querySelectorAll('.produit-item');
+            if (items.length > 1) {
+                btn.closest('.produit-item').remove();
+                recalculerTotal();
+            } else {
+                alert('Vous devez avoir au moins un produit');
+            }
+        }
+    });
+    
+    // Recalculer le total
+    function recalculerTotal() {
+        let totalGeneral = 0;
+        document.querySelectorAll('.produit-item').forEach(item => {
+            const select = item.querySelector('.produit-select');
+            const quantite = item.querySelector('.quantite-input').value;
+            const prix = select.options[select.selectedIndex]?.getAttribute('data-prix') || 0;
+            const stock = select.options[select.selectedIndex]?.getAttribute('data-stock') || 0;
+            const sousTotal = quantite * prix;
+            
+            item.querySelector('.sous-total').value = sousTotal ? sousTotal.toLocaleString() + ' FCFA' : '';
+            totalGeneral += sousTotal;
+            
+            // Vérifier le stock
+            if (quantite > stock && stock > 0) {
+                item.querySelector('.quantite-input').classList.add('is-invalid');
+                item.querySelector('.sous-total').style.color = 'red';
+            } else {
+                item.querySelector('.quantite-input').classList.remove('is-invalid');
+                item.querySelector('.sous-total').style.color = 'green';
+            }
+        });
+        document.getElementById('total-general').innerText = totalGeneral.toLocaleString();
+    }
+    
+    // Écouter les changements
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('produit-select') || e.target.classList.contains('quantite-input')) {
+            recalculerTotal();
+        }
+    });
+    
+    document.addEventListener('input', function(e) {
+        if (e.target.classList.contains('quantite-input')) {
+            recalculerTotal();
+        }
+    });
+    
+    // Validation avant soumission
+    document.getElementById('venteForm').addEventListener('submit', function(e) {
+        let hasError = false;
+        document.querySelectorAll('.produit-item').forEach(item => {
+            const select = item.querySelector('.produit-select');
+            const quantite = item.querySelector('.quantite-input').value;
+            const stock = select.options[select.selectedIndex]?.getAttribute('data-stock') || 0;
+            
+            if (!select.value) {
+                alert('Veuillez sélectionner un produit');
+                hasError = true;
+            }
+            if (quantite > stock) {
+                alert(`Stock insuffisant pour ${select.options[select.selectedIndex]?.text}`);
+                hasError = true;
+            }
+        });
+        
+        if (hasError) {
+            e.preventDefault();
+        }
+    });
+</script>
+
+{% endblock %}

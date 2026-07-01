@@ -1,0 +1,18 @@
+{% extends 'shop/base.html' %}
+
+{% block page_title %}Supprimer {{ utilisateur.username }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-danger text-white"><h5 class="mb-0">Confirmation</h5></div>
+    <div class="card-body">
+        <p>Voulez-vous vraiment supprimer l'utilisateur <strong>{{ utilisateur.username }}</strong> ?</p>
+        <p class="text-danger">Cette action est irréversible !</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Confirmer la suppression</button>
+            <a href="{% url 'liste_utilisateurs' %}" class="btn btn-secondary">Annuler</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
