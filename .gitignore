@@ -20,3 +20,13 @@ ENV/
 # IDE
 .vscode/
 .idea/db.sqlite3
+# Images uploadées
+boutique_alimentation/produits/
+boutique_alimentation/avatars/
+boutique_alimentation/categories/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.webp
