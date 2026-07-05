@@ -1,0 +1,22 @@
+# Base de données
+db.sqlite3
+*.sqlite3
+
+# Fichiers médias (images uploadées)
+media/
+
+# Fichiers Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# Fichiers de migration (optionnel)
+# shop/migrations/*
+
+# IDE
+.vscode/
+.idea/db.sqlite3
