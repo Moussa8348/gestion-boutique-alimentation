@@ -30,3 +30,5 @@ boutique_alimentation/categories/
 *.gif
 *.svg
 *.webp
+__pycache__/
+__pycache__/
