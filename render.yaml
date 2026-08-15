@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: gestion-boutique-alimentation
+    runtime: python
+    rootDir: boutique_alimentation
+    buildCommand: pip install -r ../requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate
+    startCommand: gunicorn boutique_alimentation.wsgi:application
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: PYTHON_VERSION
+        value: "3.11.3"
