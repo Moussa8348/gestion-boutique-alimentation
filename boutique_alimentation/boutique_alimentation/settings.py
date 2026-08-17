@@ -1,13 +1,7 @@
 from pathlib import Path
 import os
-import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# ------------------------------------------------------------
-# Affichage temporaire pour debug (à supprimer après)
-# ------------------------------------------------------------
-print("DATABASE_URL from env:", os.environ.get("DATABASE_URL"))
 
 # =========================================================
 # SECURITY
@@ -28,7 +22,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "shop",  # Vérifie que c'est bien le nom de ton app
+    "shop",
 ]
 
 # =========================================================
@@ -67,15 +61,19 @@ TEMPLATES = [
 WSGI_APPLICATION = "boutique_alimentation.wsgi.application"
 
 # =========================================================
-# DATABASE - Utilisation de DATABASE_URL ou fallback SQLite
+# DATABASE – avec URL en dur pour contourner le problème
 # =========================================================
 
 DATABASES = {
-    "default": dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600,
-        ssl_require=True,
-    )
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "appli_db",
+        "USER": "appli_db_user",
+        "PASSWORD": "f9p31RWGFT1UdIEe4s3C7Z6WjfRIVeTs",
+        "HOST": "dpg-d9u5plh42hec739ku4v0-a",   # sans le .onrender.com
+        "PORT": "5432",
+        "OPTIONS": {"sslmode": "require"},
+    }
 }
 
 # =========================================================
