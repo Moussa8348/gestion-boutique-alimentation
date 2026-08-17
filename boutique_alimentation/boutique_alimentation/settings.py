@@ -1,44 +1,21 @@
 from pathlib import Path
 import os
 import dj_database_url
-import dj_database_url
-import os  # Si elle n'est pas déjà présente
-
-
-DATABASES = {
-    'default': dj_database_url.config(
-        default='postgresql://postgres:postgres@localhost:5432/mysite',
-        conn_max_age=600,
-        ssl_require=True
-    )
-}
-
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# ------------------------------------------------------------
+# Affichage temporaire pour debug (à supprimer après)
+# ------------------------------------------------------------
+print("DATABASE_URL from env:", os.environ.get("DATABASE_URL"))
 
 # =========================================================
 # SECURITY
 # =========================================================
 
-SECRET_KEY = os.environ.get(
-    "SECRET_KEY",
-    "django-insecure-change-this-key-in-development"
-)
-
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-change-this-key-in-development")
 DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
-
-ALLOWED_HOSTS = [
-    "gestion-boutique-alimentation-2.onrender.com",
-    "localhost",
-    "127.0.0.1",
-]
-
-
-ALLOWED_HOSTS = ['*']  # On sécurisera plus tard avec le vrai nom
-
-SECRET_KEY = os.environ.get('SECRET_KEY')
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
 
 # =========================================================
 # APPLICATIONS
@@ -51,47 +28,25 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
-    "shop",
+    "shop",  # Vérifie que c'est bien le nom de ton app
 ]
-
 
 # =========================================================
 # MIDDLEWARE
 # =========================================================
 
 MIDDLEWARE = [
-
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
-
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
-
-# =========================================================
-# URLS
-# =========================================================
-
 ROOT_URLCONF = "boutique_alimentation.urls"
-
-
-# =========================================================
-# TEMPLATES
-# =========================================================
 
 TEMPLATES = [
     {
@@ -109,139 +64,57 @@ TEMPLATES = [
     },
 ]
 
-
-# =========================================================
-# WSGI
-# =========================================================
-
 WSGI_APPLICATION = "boutique_alimentation.wsgi.application"
 
-
 # =========================================================
-# DATABASE
+# DATABASE - Utilisation de DATABASE_URL ou fallback SQLite
 # =========================================================
 
-
-DATABASE_URL = os.environ.get("DATABASE_URL")
-
-if DATABASE_URL:
-    DATABASES = {
-        "default": dj_database_url.parse(
-            DATABASE_URL,
-            conn_max_age=600,
-            ssl_require=True,
-        )
-    }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
 DATABASES = {
-    'default': dj_database_url.config(
-        default='postgresql://postgres:postgres@localhost:5432/mysite',
+    "default": dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         conn_max_age=600,
-        ssl_require=True
+        ssl_require=True,
     )
 }
-
-
 
 # =========================================================
 # PASSWORD VALIDATION
 # =========================================================
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": (
-            "django.contrib.auth.password_validation."
-            "UserAttributeSimilarityValidator"
-        ),
-    },
-    {
-        "NAME": (
-            "django.contrib.auth.password_validation."
-            "MinimumLengthValidator"
-        ),
-    },
-    {
-        "NAME": (
-            "django.contrib.auth.password_validation."
-            "CommonPasswordValidator"
-        ),
-    },
-    {
-        "NAME": (
-            "django.contrib.auth.password_validation."
-            "NumericPasswordValidator"
-        ),
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
-
 
 # =========================================================
 # INTERNATIONALIZATION
 # =========================================================
 
 LANGUAGE_CODE = "fr-fr"
-
 TIME_ZONE = "Africa/Bamako"
-
 USE_I18N = True
 USE_TZ = True
 
-
 # =========================================================
-# STATIC FILES
+# STATIC & MEDIA
 # =========================================================
 
 STATIC_URL = "/static/"
-
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
-STATICFILES_STORAGE = (
-    "whitenoise.storage.CompressedManifestStaticFilesStorage"
-)
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-# Default primary key field type
-
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True 
-
-# Configuration email pour le développement (affiche les emails dans la console)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-# URL de redirection pour le login obligatoire (si @login_required)
-LOGIN_URL = 'connexion'
-
-# Dossier pour les fichiers uploadés (images, avatars)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-
 # =========================================================
-# EMAIL
+# SESSIONS, EMAIL, LOGIN
 # =========================================================
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
-
-# =========================================================
-# LOGIN
-# =========================================================
-
 LOGIN_URL = "connexion"
-
-
-# =========================================================
-# DEFAULT PRIMARY KEY
-# =========================================================
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
