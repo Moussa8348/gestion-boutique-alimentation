@@ -67,7 +67,7 @@ WSGI_APPLICATION = "boutique_alimentation.wsgi.application"
 
 DATABASES = {
     "default": dj_database_url.parse(
-        "postgresql://appli_db_user:f9p31RWGFT1UdIEe4s3C7Z6WjfRIVeTs@dpg-d9u5plh42hec739ku4v0-a.../appli_db",
+        "postgresql://appli_db_user:f9p31RWGFT1UdIEe4s3C7Z6WjfRIveTs@dpg-d9u5plh42hec739ku4v0-a/appli_db",
         conn_max_age=600,
         ssl_require=True,
     )
