@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -61,19 +62,15 @@ TEMPLATES = [
 WSGI_APPLICATION = "boutique_alimentation.wsgi.application"
 
 # =========================================================
-# DATABASE – avec URL en dur pour contourner le problème
+# DATABASE – utilise DATABASE_URL (variable d’environnement)
 # =========================================================
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "appli_db",
-        "USER": "appli_db_user",
-        "PASSWORD": "f9p31RWGFT1UdIEe4s3C7Z6WjfRIVeTs",
-        "HOST": "dpg-d9u5plh42hec739ku4v0-a",   # sans le .onrender.com
-        "PORT": "5432",
-        "OPTIONS": {"sslmode": "require"},
-    }
+    "default": dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+        ssl_require=True,
+    )
 }
 
 # =========================================================
