@@ -1,377 +1,385 @@
-{% extends 'shop/base.html' %}
-{% load static %}
-
-{% block page_title %}Tableau de bord - Gérant{% endblock %}
-
-{% block extra_css %}
+{% extends 'shop/base.html' %} {% load static %} {% block page_title %}Tableau
+de bord - Gérant{% endblock %} {% block extra_css %}
 <style>
-    .hero-banner {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 20px;
-        padding: 30px;
-        margin-bottom: 30px;
-        color: white;
-    }
-    
-    /* Grille des statistiques - 4 cartes sur une ligne */
-    .stats-container {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-    
-    .stat-card {
-        background: white;
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-        transition: transform 0.2s;
-        text-align: center;
-    }
-    
-    .stat-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-    }
-    
-    .stat-number {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #1a1a2e;
-    }
-    
-    .stat-label {
-        color: #666;
-        font-size: 0.85rem;
-        margin-top: 5px;
-    }
-    
-    .stat-icon {
-        font-size: 2rem;
-        margin-bottom: 10px;
-    }
-    
-    /* Grille des actions rapides */
-    .actions-container {
-        display: grid;
-        grid-template-columns: repeat(6, 1fr);
-        gap: 15px;
-        margin-bottom: 30px;
-    }
-    
-    .action-card {
-        background: white;
-        border-radius: 16px;
-        padding: 20px;
-        text-align: center;
-        text-decoration: none;
-        color: #333;
-        transition: all 0.2s;
-        border: 1px solid #f0f0f0;
-        display: block;
-    }
-    
-    .action-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    }
-    
-    .action-icon {
-        font-size: 2rem;
-        margin-bottom: 10px;
-    }
-    
-    .action-title {
-        font-size: 0.85rem;
-        font-weight: 500;
-    }
-    
-    /* Grille des sections récentes */
-    .recent-container {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-    
-    .recent-card {
-        background: white;
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    }
-    
-    .recent-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #eee;
-    }
-    
-    .recent-header h5 {
-        margin: 0;
-        font-size: 1rem;
-        font-weight: 600;
-    }
-    
-    .chart-card {
-        background: white;
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-        margin-bottom: 30px;
-    }
-    
-    /* Responsive */
-    @media (max-width: 1200px) {
-        .stats-container {
-            grid-template-columns: repeat(2, 1fr);
-        }
-        .actions-container {
-            grid-template-columns: repeat(3, 1fr);
-        }
-    }
-    
-    @media (max-width: 768px) {
-        .stats-container {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-        .actions-container {
-            grid-template-columns: repeat(2, 1fr);
-        }
-        .recent-container {
-            grid-template-columns: 1fr;
-        }
-    }
-    
-    @media (max-width: 480px) {
-        .stats-container {
-            grid-template-columns: 1fr;
-        }
-        .actions-container {
-            grid-template-columns: 1fr;
-        }
-    }
-    
-    .table-sm td, .table-sm th {
-        padding: 10px;
-        vertical-align: middle;
-    }
-    
-    .badge-success {
-        background: #d4edda;
-        color: #155724;
-        padding: 3px 8px;
-        border-radius: 20px;
-        font-size: 0.7rem;
-    }
-    
-    .badge-warning {
-        background: #fff3cd;
-        color: #856404;
-        padding: 3px 8px;
-        border-radius: 20px;
-        font-size: 0.7rem;
-    }
-    
-    .badge-danger {
-        background: #f8d7da;
-        color: #721c24;
-        padding: 3px 8px;
-        border-radius: 20px;
-        font-size: 0.7rem;
-    }
-</style>
-{% endblock %}
+  .hero-banner {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+    color: white;
+  }
 
-{% block content %}
+  /* Grille des statistiques - 4 cartes sur une ligne */
+  .stats-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s;
+    text-align: center;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  .stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a2e;
+  }
+
+  .stat-label {
+    color: #666;
+    font-size: 0.85rem;
+    margin-top: 5px;
+  }
+
+  .stat-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+
+  /* Grille des actions rapides */
+  .actions-container {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 15px;
+    margin-bottom: 30px;
+  }
+
+  .action-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.2s;
+    border: 1px solid #f0f0f0;
+    display: block;
+  }
+
+  .action-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .action-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+
+  .action-title {
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  /* Grille des sections récentes */
+  .recent-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .recent-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .recent-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .recent-header h5 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .chart-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px;
+  }
+
+  /* Responsive */
+  @media (max-width: 1200px) {
+    .stats-container {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .actions-container {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .stats-container {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+    .actions-container {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .recent-container {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .stats-container {
+      grid-template-columns: 1fr;
+    }
+    .actions-container {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .table-sm td,
+  .table-sm th {
+    padding: 10px;
+    vertical-align: middle;
+  }
+
+  .badge-success {
+    background: #d4edda;
+    color: #155724;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+  }
+
+  .badge-warning {
+    background: #fff3cd;
+    color: #856404;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+  }
+
+  .badge-danger {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+  }
+</style>
+{% endblock %} {% block content %}
 
 <!-- Bannière -->
 <div class="hero-banner">
-    <h1><i class="fas fa-store"></i> Boutique Alimentation</h1>
-    <p>Bienvenue {{ user.username }} ! Gérez votre boutique en toute simplicité</p>
-    <div class="row mt-3">
-        <div class="col-auto">
-            <div class="bg-white bg-opacity-25 rounded p-2">
-                <small>📅 Ouverture</small><br>
-                <strong>01 Janvier 2024</strong>
-            </div>
-        </div>
-        <div class="col-auto">
-            <div class="bg-white bg-opacity-25 rounded p-2">
-                <small>⏰ Horaires</small><br>
-                <strong>08:00 - 20:00</strong>
-            </div>
-        </div>
+  <h1><i class="fas fa-store"></i> Boutique Alimentation</h1>
+  <p>
+    Bienvenue {{ user.username }} ! Gérez votre boutique en toute simplicité
+  </p>
+  <div class="row mt-3">
+    <div class="col-auto">
+      <div class="bg-white bg-opacity-25 rounded p-2">
+        <small>📅 Ouverture</small><br />
+        <strong>01 Janvier 2026</strong>
+      </div>
     </div>
+    <div class="col-auto">
+      <div class="bg-white bg-opacity-25 rounded p-2">
+        <small>⏰ Horaires</small><br />
+        <strong>08:00 - 20:00</strong>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Cartes statistiques en grille 4 colonnes -->
 <div class="stats-container">
-    <div class="stat-card">
-        <div class="stat-icon">📦</div>
-        <div class="stat-number">{{ total_produits }}</div>
-        <div class="stat-label">Produits en stock</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon">💰</div>
-        <div class="stat-number">{{ mes_ventes }}</div>
-        <div class="stat-label">Ventes réalisées</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon">📊</div>
-        <div class="stat-number">{{ ca_total|floatformat:0 }} FCFA</div>
-        <div class="stat-label">Chiffre d'affaires</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon">⚠️</div>
-        <div class="stat-number">{{ produits_alerte }}</div>
-        <div class="stat-label">Alertes stock</div>
-    </div>
+  <div class="stat-card">
+    <div class="stat-icon">📦</div>
+    <div class="stat-number">{{ total_produits }}</div>
+    <div class="stat-label">Produits en stock</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">💰</div>
+    <div class="stat-number">{{ mes_ventes }}</div>
+    <div class="stat-label">Ventes réalisées</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">📊</div>
+    <div class="stat-number">{{ ca_total|floatformat:0 }} FCFA</div>
+    <div class="stat-label">Chiffre d'affaires</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">⚠️</div>
+    <div class="stat-number">{{ produits_alerte }}</div>
+    <div class="stat-label">Alertes stock</div>
+  </div>
 </div>
 
 <!-- Actions rapides en grille 6 colonnes -->
 <div class="actions-container">
-    <a href="{% url 'ajouter_produit' %}" class="action-card">
-        <div class="action-icon">➕</div>
-        <div class="action-title">Ajouter produit</div>
-    </a>
-    <a href="{% url 'nouvelle_vente' %}" class="action-card">
-        <div class="action-icon">💰</div>
-        <div class="action-title">Nouvelle vente</div>
-    </a>
-    <a href="{% url 'nouvel_achat' %}" class="action-card">
-        <div class="action-icon">📦</div>
-        <div class="action-title">Nouvel achat</div>
-    </a>
-    <a href="{% url 'liste_fournisseurs' %}" class="action-card">
-        <div class="action-icon">🤝</div>
-        <div class="action-title">Fournisseurs</div>
-    </a>
-    <a href="{% url 'liste_produits' %}" class="action-card">
-        <div class="action-icon">📊</div>
-        <div class="action-title">Gérer stock</div>
-    </a>
-    <a href="{% url 'alertes_stock' %}" class="action-card">
-        <div class="action-icon">⚠️</div>
-        <div class="action-title">Alertes</div>
-    </a>
+  <a href="{% url 'ajouter_produit' %}" class="action-card">
+    <div class="action-icon">➕</div>
+    <div class="action-title">Ajouter produit</div>
+  </a>
+  <a href="{% url 'nouvelle_vente' %}" class="action-card">
+    <div class="action-icon">💰</div>
+    <div class="action-title">Nouvelle vente</div>
+  </a>
+  <a href="{% url 'nouvel_achat' %}" class="action-card">
+    <div class="action-icon">📦</div>
+    <div class="action-title">Nouvel achat</div>
+  </a>
+  <a href="{% url 'liste_fournisseurs' %}" class="action-card">
+    <div class="action-icon">🤝</div>
+    <div class="action-title">Fournisseurs</div>
+  </a>
+  <a href="{% url 'liste_produits' %}" class="action-card">
+    <div class="action-icon">📊</div>
+    <div class="action-title">Gérer stock</div>
+  </a>
+  <a href="{% url 'alertes_stock' %}" class="action-card">
+    <div class="action-icon">⚠️</div>
+    <div class="action-title">Alertes</div>
+  </a>
 </div>
 
 <!-- Graphique -->
 <div class="chart-card">
-    <h5><i class="fas fa-chart-line"></i> Évolution des ventes (7 derniers jours)</h5>
-    <canvas id="salesChart" style="height: 250px; width: 100%;"></canvas>
+  <h5>
+    <i class="fas fa-chart-line"></i> Évolution des ventes (7 derniers jours)
+  </h5>
+  <canvas id="salesChart" style="height: 250px; width: 100%"></canvas>
 </div>
 
 <!-- Derniers produits et dernières ventes - 2 colonnes -->
 <div class="recent-container">
-    <!-- Derniers produits -->
-    <div class="recent-card">
-        <div class="recent-header">
-            <h5><i class="fas fa-box"></i> Derniers produits</h5>
-            <a href="{% url 'liste_produits' %}" class="btn btn-sm btn-outline-primary">Voir tout</a>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-sm">
-                <thead>
-                    <tr>
-                        <th>Produit</th>
-                        <th>Prix</th>
-                        <th>Stock</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for p in derniers_produits|slice:":5" %}
-                    <tr>
-                        <td><strong>{{ p.nom }}</strong></td>
-                        <td>{{ p.prix_vente }} FCFA</td>
-                        <td>
-                            {% if p.quantite_stock == 0 %}
-                                <span class="badge-danger">Rupture</span>
-                            {% elif p.stock_faible %}
-                                <span class="badge-warning">{{ p.quantite_stock }} restants</span>
-                            {% else %}
-                                <span class="badge-success">{{ p.quantite_stock }}</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <a href="{% url 'modifier_produit' p.id %}" class="btn btn-sm btn-primary">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="4" class="text-center">Aucun produit</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+  <!-- Derniers produits -->
+  <div class="recent-card">
+    <div class="recent-header">
+      <h5><i class="fas fa-box"></i> Derniers produits</h5>
+      <a
+        href="{% url 'liste_produits' %}"
+        class="btn btn-sm btn-outline-primary"
+        >Voir tout</a
+      >
     </div>
+    <div class="table-responsive">
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th>Produit</th>
+            <th>Prix</th>
+            <th>Stock</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in derniers_produits|slice:":5" %}
+          <tr>
+            <td><strong>{{ p.nom }}</strong></td>
+            <td>{{ p.prix_vente }} FCFA</td>
+            <td>
+              {% if p.quantite_stock == 0 %}
+              <span class="badge-danger">Rupture</span>
+              {% elif p.stock_faible %}
+              <span class="badge-warning">{{ p.quantite_stock }} restants</span>
+              {% else %}
+              <span class="badge-success">{{ p.quantite_stock }}</span>
+              {% endif %}
+            </td>
+            <td>
+              <a
+                href="{% url 'modifier_produit' p.id %}"
+                class="btn btn-sm btn-primary"
+              >
+                <i class="fas fa-edit"></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" class="text-center">Aucun produit</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-    <!-- Dernières ventes -->
-    <div class="recent-card">
-        <div class="recent-header">
-            <h5><i class="fas fa-receipt"></i> Dernières ventes</h5>
-            <a href="{% url 'liste_ventes' %}" class="btn btn-sm btn-outline-primary">Voir tout</a>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-sm">
-                <thead>
-                    <tr>
-                        <th>N° Vente</th>
-                        <th>Montant</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for v in dernieres_ventes|slice:":5" %}
-                    <tr>
-                        <td>{{ v.numero }}</td>
-                        <td><strong>{{ v.total|floatformat:0 }} FCFA</strong></td>
-                        <td>{{ v.date_vente|date:"d/m/Y H:i" }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="3" class="text-center">Aucune vente</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+  <!-- Dernières ventes -->
+  <div class="recent-card">
+    <div class="recent-header">
+      <h5><i class="fas fa-receipt"></i> Dernières ventes</h5>
+      <a href="{% url 'liste_ventes' %}" class="btn btn-sm btn-outline-primary"
+        >Voir tout</a
+      >
     </div>
+    <div class="table-responsive">
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th>N° Vente</th>
+            <th>Montant</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for v in dernieres_ventes|slice:":5" %}
+          <tr>
+            <td>{{ v.numero }}</td>
+            <td><strong>{{ v.total|floatformat:0 }} FCFA</strong></td>
+            <td>{{ v.date_vente|date:"d/m/Y H:i" }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="3" class="text-center">Aucune vente</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
-{% endblock %}
-
-{% block extra_js %}
+{% endblock %} {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const ctx = document.getElementById('salesChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
-            datasets: [{
-                label: 'Ventes (FCFA)',
-                data: [12500, 18300, 15200, 21000, 27800, 32500, 19800],
-                borderColor: '#667eea',
-                backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                tension: 0.3,
-                fill: true
-            }]
+  const ctx = document.getElementById("salesChart").getContext("2d");
+  new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
+      datasets: [
+        {
+          label: "Ventes (FCFA)",
+          data: [12500, 18300, 15200, 21000, 27800, 32500, 19800],
+          borderColor: "#667eea",
+          backgroundColor: "rgba(102, 126, 234, 0.1)",
+          tension: 0.3,
+          fill: true,
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true
-        }
-    });
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+    },
+  });
 </script>
 {% endblock %}
