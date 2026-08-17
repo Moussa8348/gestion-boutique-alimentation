@@ -62,12 +62,12 @@ TEMPLATES = [
 WSGI_APPLICATION = "boutique_alimentation.wsgi.application"
 
 # =========================================================
-# DATABASE – utilise DATABASE_URL (variable d’environnement)
+# DATABASE – URL en dur (copiée depuis votre base Render)
 # =========================================================
 
 DATABASES = {
-    "default": dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+    "default": dj_database_url.parse(
+        "postgresql://appli_db_user:f9p31RWGFT1UdIEe4s3C7Z6WjfRIVeTs@dpg-d9u5plh42hec739ku4v0-a.../appli_db",
         conn_max_age=600,
         ssl_require=True,
     )
